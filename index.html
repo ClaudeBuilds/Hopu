@@ -30,14 +30,16 @@ p{margin:0}
 .me:hover{background:var(--soft)}
 .mename{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
 .nav{display:flex;flex-direction:column;gap:6px}
-.nav a,.logout,.snd{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:3px solid transparent;text-decoration:none;font-size:21px;font-weight:500;background:none;cursor:pointer;transition:.15s}
-.nav a .ico,.logout .ico,.snd .ico{width:30px;height:30px}
-.nav a:hover,.logout:hover,.snd:hover{border-color:var(--ink)}
-.nav a:active,.logout:active,.snd:active{transform:scale(.95);transition-duration:.04s}
+.nav a,.logout{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:3px solid transparent;text-decoration:none;font-size:21px;font-weight:500;background:none;cursor:pointer;transition:.15s}
+.nav a .ico,.logout .ico{width:30px;height:30px}
+.nav a:hover,.logout:hover{border-color:var(--ink)}
+.nav a:active,.logout:active{transform:scale(.95);transition-duration:.04s}
 .nav a.on{background:var(--ink);color:var(--paper)}
-.snd{margin-top:auto;width:100%;text-align:left}
-.logout{width:100%;text-align:left}
-.pwcard{max-width:640px;margin-bottom:34px}
+.logout{margin-top:auto;width:100%;text-align:left}
+.pwrow{display:flex;gap:12px;align-items:center}
+.pwrow input{flex:1;min-width:0}
+.pwpanel{border:3px dashed var(--ink);border-radius:22px;padding:16px 18px 8px;margin-top:14px}
+.pwpanel .acts{margin:4px 0 10px}
 .main{padding:28px 40px 130px;min-width:0}
 .head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
 .sec{margin-bottom:30px}
@@ -145,10 +147,9 @@ p{margin:0}
   .logo{font-size:34px}
   .me{margin:0}.mename{max-width:110px}
   .nav{flex-direction:row;flex-wrap:wrap;width:100%;order:5}
-  .nav a,.logout,.snd{font-size:17px;padding:6px 10px}
-  .nav a .ico,.logout .ico,.snd .ico{width:24px;height:24px}
-  .snd{margin:0 0 0 auto;width:auto}
-  .logout{margin:0;width:auto}
+  .nav a,.logout{font-size:17px;padding:6px 10px}
+  .nav a .ico,.logout .ico{width:24px;height:24px}
+  .logout{margin:0 0 0 auto;width:auto}
   .main{padding:20px 16px 120px}
   h1{font-size:34px}
   .card{width:300px}
@@ -203,7 +204,7 @@ const ICONS = {
   home: '<path d="M3 11.5 12 3.5l9 8"/><path d="M5.5 10v10h13V10"/>',
   user: '<circle cx="12" cy="7" r="4"/><rect x="6" y="14" width="12" height="7" rx="3"/>',
   news: '<path d="M4 5h16v11h-9.5L6 20.5V16H4z"/>',
-  create: '<g transform="rotate(45 12 12)"><rect x="4.500" y="3" width="15" height="5.500" rx="1.500"/><rect x="10.500" y="8.500" width="3" height="12.500" rx="1"/></g>',
+  create: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
   sound: '<path d="M4 9.500h4l5-4v13l-5-4H4z"/><path d="M16.500 9a4 4 0 0 1 0 6M19 6.500a8 8 0 0 1 0 11"/>',
   mute: '<path d="M4 9.500h4l5-4v13l-5-4H4z"/><path d="M17 9.500l5 5M22 9.500l-5 5"/>',
   star: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
@@ -254,7 +255,7 @@ const sfx = (() => {
     welcome: seq([523, 659, 784, 1047], 'triangle', .12, .09, .22)
   };
 })();
-const SND_SEL = '.btn,.nav a,.logout,.snd,.stat,.rarrow,.logo,.me,.picker';
+const SND_SEL = '.btn,.nav a,.logout,.stat,.rarrow,.logo,.me,.picker';
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest?.(SND_SEL);
   if (!b || b.disabled) return;
@@ -457,15 +458,10 @@ const favGames = p => (p.favorites || []).map(id => state.games.find(g => g.id =
 function mount(active) {
   const p = state.profile;
   const nav = [['home', 'Homepage', 'home'], ['profile', 'Profile', 'user'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
-  const sndLabel = () => [icon(sfx.muted ? 'mute' : 'sound'), el('span', {}, sfx.muted ? 'Sound: Off' : 'Sound: On')];
-  const snd = el('button', { class: 'snd', 'aria-label': 'Toggle sound' });
-  snd.append(...sndLabel());
-  snd.addEventListener('click', () => { sfx.set(!sfx.muted); snd.replaceChildren(...sndLabel()); if (!sfx.muted) sfx.click(); });
   const side = el('aside', { class: 'side' },
     el('a', { class: 'logo', href: '#/home' }, 'HOPU'),
     el('a', { class: 'me', href: '#/profile' }, avatar(p, 40), el('span', { class: 'mename' }, p.username)),
     el('nav', { class: 'nav' }, nav.map(([k, l, i]) => el('a', { href: '#/' + k, class: k === active ? 'on' : '' }, icon(i), el('span', {}, l)))),
-    snd,
     el('button', { class: 'logout', 'data-snd': 'logout', onclick: () => signOut(auth) }, icon('logout'), el('span', {}, 'Log Out')));
   const main = el('main', { class: 'main' });
   app.replaceChildren(el('div', { class: 'shell' }, side, main));
@@ -562,34 +558,42 @@ async function homeView(soft, tok) {
   draw();
 }
 
-function pwCard() {
-  const o = el('input', { type: 'password', maxlength: 64, autocomplete: 'current-password', placeholder: 'Your Current Password' });
-  const n = el('input', { type: 'password', maxlength: 64, autocomplete: 'new-password', placeholder: 'At Least 8 Characters' });
-  const c = el('input', { type: 'password', maxlength: 64, autocomplete: 'new-password', placeholder: 'Repeat The New Password' });
+function pwBlock() {
+  const mk = (ac, ph) => el('input', { type: 'password', maxlength: 64, autocomplete: ac, placeholder: ph });
+  const o = mk('current-password', 'Your Current Password');
+  const n = mk('new-password', 'At Least 8 Characters');
+  const c = mk('new-password', 'Repeat The New Password');
+  const shown = el('input', { type: 'text', value: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022', disabled: true });
   const err = el('div', { class: 'err', style: 'display:none' });
-  const btn = el('button', { class: 'btn', type: 'submit' }, 'Change Password');
   const bad = m => { err.textContent = m; err.style.display = 'block'; sfx.err(); };
-  return el('form', { class: 'pwcard', onsubmit: async e => {
-    e.preventDefault(); err.style.display = 'none';
+  const close = () => { o.value = ''; n.value = ''; c.value = ''; err.style.display = 'none'; panel.style.display = 'none'; change.style.display = ''; };
+  const submit = async () => {
+    err.style.display = 'none';
     if (!o.value) return bad('Enter Your Current Password');
     if (n.value.length < 8) return bad('New Password Must Have At Least 8 Characters');
     if (n.value !== c.value) return bad('New Passwords Do Not Match');
     if (n.value === o.value) return bad('New Password Must Be Different From The Old One');
-    btn.disabled = true;
+    save.disabled = true;
     try {
       const u = auth.currentUser;
       await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, o.value));
       await updatePassword(u, n.value);
-      o.value = ''; n.value = ''; c.value = '';
+      close();
       toast('Password Changed');
     } catch (ex) {
       const k = ex?.code || '';
       bad(k === 'auth/invalid-credential' || k === 'auth/wrong-password' ? 'Your Current Password Is Wrong'
         : k === 'auth/weak-password' ? 'New Password Is Too Weak' : friendly(ex));
     }
-    btn.disabled = false;
-  } }, el('h2', {}, 'Change Password'),
-    field('Current Password', o), field('New Password', n), field('Repeat New Password', c), err, btn);
+    save.disabled = false;
+  };
+  const save = el('button', { class: 'btn dark', onclick: submit }, 'Update Password');
+  const change = el('button', { class: 'btn pill', onclick: () => { change.style.display = 'none'; panel.style.display = 'block'; o.focus(); } }, 'Change');
+  [o, n, c].forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); }));
+  const panel = el('div', { class: 'pwpanel', style: 'display:none' },
+    field('Current Password', o), field('New Password', n), field('Repeat New Password', c), err,
+    el('div', { class: 'acts' }, save, el('button', { class: 'btn', onclick: close }, 'Cancel')));
+  return el('div', { class: 'field' }, el('label', {}, 'Password'), el('div', { class: 'pwrow' }, shown, change), panel);
 }
 
 async function ownProfileView(soft, tok) {
@@ -637,8 +641,7 @@ async function ownProfileView(soft, tok) {
   } }, 'Save');
   main.append(el('h1', { style: 'margin-bottom:22px' }, 'Profile'),
     el('div', { class: 'prof' }, left,
-      el('div', { class: 'form' }, field('Username', name, hint), field('Description', desc, '', 150), err, btn)),
-    pwCard(),
+      el('div', { class: 'form' }, field('Username', name, hint), field('Description', desc, '', 150), pwBlock(), err, btn)),
     section('Games', state.games.filter(g => g.ownerId === state.user.uid), "You Haven't Created Any Games Yet"),
     section('Favorites', favGames(p), 'No Favorite Games Yet'));
 }
