@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hopu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='45' font-size='38' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23fff'%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#000;--paper:#fff;--muted:#6a6a6a;--soft:#f1f1f1}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;font-size:18px}
+button,input,textarea{font:inherit;color:inherit}
+a{color:inherit}
+h1{font-size:42px;margin:0;font-weight:700;letter-spacing:.3px}
+h2{font-size:26px;margin:0 0 10px;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.ico{display:inline-flex;width:1.25em;height:1.25em;flex:0 0 auto}
+.ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.loading{display:grid;place-items:center;min-height:100vh;font-size:28px;font-weight:600}
+
+/* Layout */
+.shell{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+.side{border-right:3px solid var(--ink);padding:18px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.logo{font-size:46px;font-weight:700;letter-spacing:3px;text-decoration:none;line-height:1.1;margin:0 8px 6px}
+.me{display:flex;align-items:center;gap:10px;text-decoration:none;padding:6px 8px;border-radius:14px;font-size:20px;font-weight:500;margin-bottom:8px}
+.me:hover{background:var(--soft)}
+.mename{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav a,.logout{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:3px solid transparent;text-decoration:none;font-size:21px;font-weight:500;background:none;cursor:pointer;transition:.15s}
+.nav a .ico,.logout .ico{width:30px;height:30px}
+.nav a:hover,.logout:hover{border-color:var(--ink)}
+.nav a.on{background:var(--ink);color:var(--paper)}
+.logout{margin-top:auto;width:100%;text-align:left}
+.main{padding:28px 40px 130px;min-width:0}
+.head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.sec{margin-bottom:30px}
+
+/* Buttons and fields */
+.btn{border:3px solid var(--ink);background:var(--paper);color:var(--ink);padding:9px 28px;font-size:22px;font-weight:600;cursor:pointer;border-radius:8px;box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s,background .12s,color .12s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:var(--ink);color:var(--paper)}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.btn.dark{background:var(--ink);color:var(--paper)}
+.btn.dark:hover{background:var(--paper);color:var(--ink)}
+.btn.pill{border-radius:18px;padding:5px 24px;font-size:20px;box-shadow:3px 3px 0 var(--ink)}
+.btn.small{font-size:16px;padding:3px 14px}
+.btn.wide{width:100%}
+.fab{position:fixed;right:34px;bottom:28px;z-index:5;background:var(--paper)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:22px;font-weight:600;margin:0 0 6px 6px}
+.field input,.field textarea,.search input{width:100%;border:3px solid var(--ink);border-radius:40px;padding:11px 22px;font-size:20px;background:var(--paper);outline:none;transition:box-shadow .12s}
+.field textarea{border-radius:26px;resize:none;min-height:130px;line-height:1.35}
+.field input:focus,.field textarea:focus,.search:focus-within{box-shadow:4px 4px 0 var(--ink)}
+.field input:disabled{background:var(--soft);color:var(--muted)}
+.hint{font-size:15px;color:var(--muted);margin:5px 0 0 8px;display:flex;justify-content:space-between;gap:10px}
+.err{color:var(--ink);font-weight:600;border:3px dashed var(--ink);border-radius:16px;padding:8px 14px;margin-bottom:14px;font-size:17px}
+.search{display:flex;align-items:center;gap:8px;border:3px solid var(--ink);border-radius:40px;padding:0 16px;width:min(360px,100%);transition:box-shadow .12s}
+.search input{border:0;padding:10px 4px;box-shadow:none!important;font-size:20px}
+
+/* Avatars, tiles, pickers */
+.avatar{border-radius:50%;border:3px solid var(--ink);background:var(--ink);color:var(--paper);display:grid;place-items:center;font-weight:700;overflow:hidden;flex:0 0 auto}
+.avatar img,.picker img{width:100%;height:100%;object-fit:cover;display:block}
+.tile{width:110px;height:110px;border:3px solid var(--ink);border-radius:22px;overflow:hidden;background:var(--paper);display:grid;place-items:center;flex:0 0 auto}
+.tile img{width:100%;height:100%;object-fit:cover}
+.tile .tl{font-size:52px;font-weight:700}
+.picker{position:relative;border:3px solid var(--ink);overflow:hidden;cursor:pointer;background:var(--paper);flex:0 0 auto}
+.picker.round{border-radius:50%}
+.picker.sq{border-radius:34px}
+.picker .ph{width:100%;height:100%;display:grid;place-items:center;font-weight:700}
+.picker.round .ph{background:var(--ink);color:var(--paper)}
+.picker .cam{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);color:#fff;opacity:0;transition:opacity .15s}
+.picker .cam .ico{width:46px;height:46px}
+.picker:hover .cam{opacity:1}
+@media (hover:none){.picker .cam{opacity:.0}.picker::after{content:'';position:absolute;right:8px;bottom:8px;width:14px;height:14px;border-radius:50%;background:var(--ink);border:2px solid #fff}}
+
+/* Game cards */
+.rowwrap{position:relative}
+.row{display:flex;gap:30px;overflow-x:auto;padding:6px 8px 16px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--ink) transparent}
+.rarrow{position:absolute;right:4px;top:50px;width:60px;height:46px;border:3px solid var(--ink);background:var(--paper);border-radius:10px;display:none;place-items:center;cursor:pointer;box-shadow:3px 3px 0 var(--ink);z-index:2}
+.rarrow:hover{background:var(--ink);color:var(--paper)}
+.rarrow .ico{width:30px;height:30px}
+.card{display:flex;gap:14px;flex:0 0 auto;width:330px}
+.card .info{min-width:0;display:flex;flex-direction:column;gap:2px}
+.gname{font-size:24px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.by{font-size:16px;font-weight:500}
+.by a{font-weight:600;text-decoration:none;border-bottom:2px solid var(--ink)}
+.by a:hover{background:var(--ink);color:var(--paper)}
+.stats{display:flex;gap:12px;margin:3px 0 6px}
+.stat{display:flex;align-items:center;gap:4px;background:none;border:0;padding:2px 2px;cursor:pointer;font-size:19px;font-weight:600;transition:transform .12s}
+.stat:hover{transform:scale(1.15)}
+.stat.on .ico svg{fill:currentColor}
+.stat.down .ico{transform:rotate(180deg) scaleX(-1)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.mine{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.mine .gname{margin-bottom:8px;max-width:340px}
+
+/* Profile */
+.prof{display:flex;gap:44px;flex-wrap:wrap;align-items:flex-start;margin-bottom:34px}
+.prof .form{flex:1 1 360px;max-width:640px}
+.prof .name{font-size:40px;font-weight:700;word-break:break-all}
+.prof .meta{font-size:18px;color:var(--muted);margin:2px 0 14px}
+.prof .desc{font-size:20px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+
+/* News */
+.post{border:3px solid var(--ink);border-radius:22px;padding:16px 22px;margin-bottom:18px;max-width:760px;box-shadow:5px 5px 0 var(--ink)}
+.post .who{font-size:28px;font-weight:700}
+.post .txt{font-size:20px;line-height:1.4;white-space:pre-wrap;word-break:break-word;margin:4px 0 8px}
+.post .when{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+/* Auth */
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+.auth-card{width:min(480px,100%);border:3px solid var(--ink);border-radius:30px;padding:30px 30px 26px;box-shadow:9px 9px 0 var(--ink)}
+.auth-card h1{font-size:36px;margin-bottom:20px;line-height:1.15}
+.auth-card .big{font-size:76px;font-weight:700;letter-spacing:6px;text-align:center;line-height:1;margin-bottom:6px}
+.auth-card .tag{text-align:center;font-size:23px;font-weight:600;margin-bottom:20px}
+.auth-card .alt{text-align:center;margin-top:16px;font-size:17px}
+.auth-card .alt a{font-weight:700;cursor:pointer;border-bottom:2px solid var(--ink);text-decoration:none}
+.auth-card .alt a:hover{background:var(--ink);color:var(--paper)}
+.auth-card .btn{margin-top:6px}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:50;padding:20px}
+.modal{background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:24px;width:min(520px,100%);box-shadow:8px 8px 0 var(--ink)}
+.modal p{margin-bottom:16px;font-size:19px}
+.mbtns{display:flex;gap:14px;justify-content:flex-end;margin-top:10px}
+#toasts{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:99;align-items:center;pointer-events:none}
+.toast{background:var(--ink);color:var(--paper);padding:10px 22px;border-radius:30px;font-weight:600;font-size:18px;animation:pop .25s ease}
+@keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.setup{max-width:640px;margin:60px auto;padding:0 20px}
+.setup code{background:var(--soft);padding:2px 8px;border-radius:8px}
+
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:3px solid var(--ink);gap:4px 10px}
+  .logo{font-size:34px}
+  .me{margin:0}.mename{max-width:110px}
+  .nav{flex-direction:row;flex-wrap:wrap;width:100%;order:5}
+  .nav a,.logout{font-size:17px;padding:6px 10px}
+  .nav a .ico,.logout .ico{width:24px;height:24px}
+  .logout{margin:0 0 0 auto;width:auto}
+  .main{padding:20px 16px 120px}
+  h1{font-size:34px}
+  .card{width:300px}
+  .fab{right:16px;bottom:16px}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Loading...</div></div>
+<div id="toasts"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ============================================================
+   PASTE YOUR FIREBASE CONFIG HERE
+   (Firebase Console > Project Settings > Your Apps > Web App)
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDsxORa4yoWTI4ZmjD_8oC0MECLuSosCL8",
+  authDomain: "hopu-cc0e0.firebaseapp.com",
+  projectId: "hopu-cc0e0",
+  storageBucket: "hopu-cc0e0.firebasestorage.app",
+  messagingSenderId: "1040038079324",
+  appId: "1:1040038079324:web:35de0ab75fa164c4316f99",
+  measurementId: "G-1ENXC3GSTR"
+};
+
+const app = document.getElementById('app');
+const configured = !Object.values(firebaseConfig).some(v => String(v).startsWith('PASTE'));
+
+/* ---------- Tiny DOM helpers ---------- */
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, '');
+    else n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) {
+    if (c == null || c === false) continue;
+    n.append(c.nodeType ? c : document.createTextNode(c));
+  }
+  return n;
+}
+const ICONS = {
+  home: '<path d="M3 11.5 12 3.5l9 8"/><path d="M5.5 10v10h13V10"/>',
+  user: '<circle cx="12" cy="7" r="4"/><rect x="6" y="14" width="12" height="7" rx="3"/>',
+  news: '<path d="M4 5h16v11h-9.5L6 20.5V16H4z"/>',
+  create: '<path d="M13 3.5l7.5 7.5-3.2 3.2L9.800 6.700z"/><path d="M12.200 11.500 4.500 19.500"/>',
+  star: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
+  up: '<path d="M7 11v9H3.500v-9z"/><path d="M7 11l4-8c1.600 0 2.700 1.100 2.700 2.700V9H19a2 2 0 0 1 2 2.300l-1.200 7A2 2 0 0 1 17.800 20H7"/>',
+  camera: '<path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.500" r="3.800"/>',
+  arrow: '<path d="M4 12h15M13 6l6 6-6 6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20.500 20.500 16 16"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  logout: '<path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/>'
+};
+const icon = (n) => el('span', { class: 'ico', html: `<svg viewBox="0 0 24 24">${ICONS[n]}</svg>` });
+
+function toast(msg) {
+  const t = el('div', { class: 'toast' }, msg);
+  document.getElementById('toasts').append(t);
+  setTimeout(() => t.remove(), 3200);
+}
+function ask(title, text, yes = 'Delete') {
+  return new Promise(res => {
+    const close = v => { ov.remove(); res(v); };
+    const ov = el('div', { class: 'overlay', onclick: e => { if (e.target === ov) close(false); } },
+      el('div', { class: 'modal' }, el('h2', {}, title), el('p', {}, text),
+        el('div', { class: 'mbtns' },
+          el('button', { class: 'btn', onclick: () => close(false) }, 'Cancel'),
+          el('button', { class: 'btn dark', onclick: () => close(true) }, yes))));
+    document.body.append(ov);
+  });
+}
+function fmtDate(ts) {
+  const d = ts?.toDate ? ts.toDate() : new Date();
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+function resizeImage(file, size) {
+  return new Promise((res, rej) => {
+    if (!file.type.startsWith('image/')) return rej(new Error('Please Choose An Image File'));
+    if (file.size > 10 * 1024 * 1024) return rej(new Error('Image Is Too Big (Max 10 MB)'));
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(img.width, img.height), c = document.createElement('canvas');
+      c.width = c.height = size;
+      const x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, size, size);
+      x.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Could Not Read This Image')); };
+    img.src = url;
+  });
+}
+
+if (!configured) {
+  app.replaceChildren(el('div', { class: 'setup' },
+    el('h1', {}, 'Almost There!'),
+    el('p', { style: 'margin:16px 0;font-size:20px' }, 'Open This File In A Text Editor, Find ', el('code', {}, 'firebaseConfig'), ' And Paste The Values From Your Firebase Project.'),
+    el('p', { class: 'muted' }, 'Then Save The File And Open It Again.')));
+  throw new Error('Firebase Config Missing');
+}
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+/* ---------- State ---------- */
+const state = { user: null, profile: null, games: [], news: [], users: new Map(), tok: 0, ready: false, registering: false, busy: false, search: '' };
+const NAME_RE = /^[A-Za-z0-9_]{3,16}$/;
+const WEEK = 7 * 86400000;
+const isAdmin = () => state.profile?.username === 'Hopu';
+
+async function getUserDoc(uid, force = false) {
+  if (!force && state.users.has(uid)) return state.users.get(uid);
+  const s = await getDoc(doc(db, 'users', uid));
+  const d = s.exists() ? { id: uid, ...s.data() } : null;
+  state.users.set(uid, d);
+  return d;
+}
+async function loadGames() {
+  const s = await getDocs(query(collection(db, 'games'), orderBy('createdAt', 'desc'), limit(300)));
+  state.games = s.docs.map(d => ({ id: d.id, r: Math.random(), ...d.data() }));
+  await Promise.all([...new Set(state.games.map(g => g.ownerId))].map(u => getUserDoc(u, true)));
+}
+function friendly(e) {
+  const c = e?.code || '';
+  if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found') return 'Wrong Username Or Password';
+  if (c === 'auth/too-many-requests') return 'Too Many Attempts, Try Again Later';
+  if (c === 'auth/operation-not-allowed') return 'Email/Password Sign-In Is Not Enabled In Firebase';
+  if (c === 'auth/network-request-failed') return 'Network Error, Check Your Connection';
+  if (c === 'permission-denied') return 'Not Allowed (Check Your Firestore Rules)';
+  return e?.message || 'Something Went Wrong';
+}
+
+/* ---------- Shared components ---------- */
+function avatar(p, size) {
+  const a = el('div', { class: 'avatar', style: `width:${size}px;height:${size}px;font-size:${Math.round(size * .5)}px` });
+  if (p?.avatar) a.append(el('img', { src: p.avatar, alt: '' }));
+  else a.textContent = (p?.username || '?')[0].toUpperCase();
+  return a;
+}
+function tile(g) {
+  return el('div', { class: 'tile' }, g.icon ? el('img', { src: g.icon, alt: '' }) : el('span', { class: 'tl' }, (g.name || '?')[0].toUpperCase()));
+}
+function picker({ shape, dim, src, letter, out, onChange }) {
+  const box = el('div', { class: `picker ${shape}`, style: `width:${dim}px;height:${dim}px` });
+  const render = s => {
+    box.querySelectorAll('.pv').forEach(n => n.remove());
+    box.prepend(s ? el('img', { class: 'pv', src: s, alt: '' })
+                  : el('div', { class: 'pv ph', style: `font-size:${Math.round(dim * .45)}px` }, letter || ''));
+  };
+  render(src);
+  const file = el('input', { type: 'file', accept: 'image/*', hidden: true });
+  box.append(el('div', { class: 'cam' }, icon('camera')), file);
+  box.addEventListener('click', () => file.click());
+  file.addEventListener('change', async () => {
+    const f = file.files[0]; if (!f) return;
+    try { const d = await resizeImage(f, out); render(d); onChange(d); } catch (e) { toast(e.message); }
+    file.value = '';
+  });
+  return box;
+}
+function counter(input, max) {
+  const c = el('span', {}, `${input.value.length}/${max}`);
+  input.addEventListener('input', () => { c.textContent = `${input.value.length}/${max}`; });
+  return c;
+}
+function field(label, input, hintLeft, max) {
+  return el('div', { class: 'field' }, el('label', {}, label), input,
+    (hintLeft || max) ? el('div', { class: 'hint' }, el('span', {}, hintLeft || ''), max ? counter(input, max) : null) : null);
+}
+
+/* ---------- Game actions ---------- */
+async function react(g, kind) {
+  if (state.busy) return; state.busy = true;
+  try {
+    const uid = state.user.uid, uref = doc(db, 'users', uid), gref = doc(db, 'games', g.id);
+    const out = await runTransaction(db, async tx => {
+      const us = await tx.get(uref), gs = await tx.get(gref);
+      if (!gs.exists()) throw new Error('This Game No Longer Exists');
+      const u = us.data(), gd = gs.data(), upd = {}, gu = {};
+      if (kind === 'fav') {
+        const favs = u.favorites || [], has = favs.includes(g.id);
+        upd.favorites = has ? favs.filter(x => x !== g.id) : [...favs, g.id];
+        gu.favs = Math.max(0, (gd.favs || 0) + (has ? -1 : 1));
+      } else {
+        const votes = { ...(u.votes || {}) }, cur = votes[g.id] || 0, v = kind === 'up' ? 1 : -1, nv = cur === v ? 0 : v;
+        if (nv === 0) delete votes[g.id]; else votes[g.id] = nv;
+        upd.votes = votes;
+        gu.likes = Math.max(0, (gd.likes || 0) + (nv === 1 ? 1 : 0) - (cur === 1 ? 1 : 0));
+        gu.dislikes = Math.max(0, (gd.dislikes || 0) + (nv === -1 ? 1 : 0) - (cur === -1 ? 1 : 0));
+      }
+      tx.update(uref, upd); tx.update(gref, gu);
+      return gu;
+    });
+    Object.assign(g, out);
+    state.profile = await getUserDoc(uid, true);
+  } catch (e) { toast(friendly(e)); }
+  state.busy = false;
+  rerender();
+}
+async function removeGame(g) {
+  if (!await ask('Delete Game', `Do You Really Want To Delete "${g.name}"? This Cannot Be Undone.`)) return;
+  try {
+    await deleteDoc(doc(db, 'games', g.id));
+    state.games = state.games.filter(x => x.id !== g.id);
+    toast('Game Deleted');
+    rerender();
+  } catch (e) { toast(friendly(e)); }
+}
+function play(g) { window.open(g.link, '_blank', 'noopener'); }
+
+function gameCard(g) {
+  const owner = state.users.get(g.ownerId);
+  const fav = (state.profile?.favorites || []).includes(g.id);
+  const vote = (state.profile?.votes || {})[g.id] || 0;
+  const stat = (ic, n, on, cls, kind) => el('button', { class: `stat ${cls || ''} ${on ? 'on' : ''}`, onclick: () => react(g, kind) }, icon(ic), String(n || 0));
+  return el('div', { class: 'card' }, tile(g),
+    el('div', { class: 'info' },
+      el('div', { class: 'gname', title: g.name }, g.name),
+      el('div', { class: 'by' }, 'By ', el('a', { href: g.ownerId === state.user.uid ? '#/profile' : `#/user/${g.ownerId}` }, owner?.username || 'Unknown')),
+      el('div', { class: 'stats' }, stat('star', g.favs, fav, '', 'fav'), stat('up', g.likes, vote === 1, '', 'up'), stat('up', g.dislikes, vote === -1, 'down', 'down')),
+      el('div', { class: 'acts' },
+        el('button', { class: 'btn pill', onclick: () => play(g) }, 'Play'),
+        isAdmin() ? el('button', { class: 'btn pill small', onclick: () => removeGame(g) }, icon('trash'), 'Delete') : null)));
+}
+function section(title, games, empty) {
+  const sec = el('section', { class: 'sec' }, el('h2', {}, title));
+  if (!games.length) { sec.append(el('p', { class: 'muted' }, empty)); return sec; }
+  const row = el('div', { class: 'row' }, games.map(gameCard));
+  const arrow = el('button', { class: 'rarrow', 'aria-label': 'Next', onclick: () => row.scrollBy({ left: row.clientWidth * .8 }) }, icon('arrow'));
+  const upd = () => { arrow.style.display = (row.scrollWidth > row.clientWidth + 4 && row.scrollLeft + row.clientWidth < row.scrollWidth - 8) ? 'grid' : 'none'; };
+  row.addEventListener('scroll', upd);
+  sec.append(el('div', { class: 'rowwrap' }, row, arrow));
+  requestAnimationFrame(upd);
+  return sec;
+}
+const favGames = p => (p.favorites || []).map(id => state.games.find(g => g.id === id)).filter(Boolean);
+
+/* ---------- Shell ---------- */
+function mount(active) {
+  const p = state.profile;
+  const nav = [['home', 'Homepage', 'home'], ['profile', 'Profile', 'user'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
+  const side = el('aside', { class: 'side' },
+    el('a', { class: 'logo', href: '#/home' }, 'HOPU'),
+    el('a', { class: 'me', href: '#/profile' }, avatar(p, 40), el('span', { class: 'mename' }, p.username)),
+    el('nav', { class: 'nav' }, nav.map(([k, l, i]) => el('a', { href: '#/' + k, class: k === active ? 'on' : '' }, icon(i), el('span', {}, l)))),
+    el('button', { class: 'logout', onclick: () => signOut(auth) }, icon('logout'), el('span', {}, 'Log Out')));
+  const main = el('main', { class: 'main' });
+  app.replaceChildren(el('div', { class: 'shell' }, side, main));
+  return main;
+}
+
+/* ---------- Auth views ---------- */
+function authCard(...kids) { app.replaceChildren(el('div', { class: 'auth-wrap' }, el('div', { class: 'auth-card' }, ...kids))); }
+
+function loginView() {
+  const u = el('input', { type: 'text', placeholder: 'Username', maxlength: 16, autocomplete: 'username' });
+  const p = el('input', { type: 'password', placeholder: 'Password', maxlength: 64, autocomplete: 'current-password' });
+  const err = el('div', { class: 'err', style: 'display:none' });
+  const btn = el('button', { class: 'btn wide', type: 'submit' }, 'Log In');
+  const form = el('form', { onsubmit: async e => {
+    e.preventDefault(); err.style.display = 'none';
+    const name = u.value.trim().toLowerCase();
+    if (!name || !p.value) { err.textContent = 'Enter Your Username And Password'; err.style.display = 'block'; return; }
+    btn.disabled = true;
+    try {
+      const s = await getDoc(doc(db, 'usernames', name));
+      if (!s.exists()) throw { code: 'auth/invalid-credential' };
+      await signInWithEmailAndPassword(auth, s.data().email, p.value);
+    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; btn.disabled = false; }
+  } }, el('div', { class: 'field' }, u), el('div', { class: 'field' }, p), err, btn);
+  authCard(el('h1', {}, 'Log In To The Hopu Platform'), form,
+    el('p', { class: 'alt' }, "Don't You Have An Account? ", el('a', { href: '#/register' }, 'Register')));
+}
+
+function registerView() {
+  const u = el('input', { type: 'text', placeholder: "Don't Use Your Real Name", maxlength: 16, autocomplete: 'username' });
+  const p = el('input', { type: 'password', placeholder: 'At Least 8 Characters', maxlength: 64, autocomplete: 'new-password' });
+  const err = el('div', { class: 'err', style: 'display:none' });
+  const btn = el('button', { class: 'btn wide', type: 'submit' }, 'Register');
+  const fail = m => { err.textContent = m; err.style.display = 'block'; };
+  const form = el('form', { onsubmit: async e => {
+    e.preventDefault(); err.style.display = 'none';
+    const name = u.value.trim();
+    if (!NAME_RE.test(name)) return fail('Username: 3-16 Characters, Only Letters, Numbers And Underscore');
+    if (p.value.length < 8) return fail('Password Must Have At Least 8 Characters');
+    btn.disabled = true; state.registering = true;
+    let cred = null;
+    try {
+      const lower = name.toLowerCase();
+      if ((await getDoc(doc(db, 'usernames', lower))).exists()) throw new Error('This Username Is Already Taken');
+      const email = `hopu${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}@hopu-platform.com`;
+      cred = await createUserWithEmailAndPassword(auth, email, p.value);
+      try {
+        const b = writeBatch(db);
+        b.set(doc(db, 'usernames', lower), { uid: cred.user.uid, email, username: name });
+        b.set(doc(db, 'users', cred.user.uid), {
+          username: name, usernameLower: lower, loginEmail: email, description: '', avatar: '',
+          createdAt: serverTimestamp(), lastNameChange: Timestamp.fromMillis(0), favorites: [], votes: {}
+        });
+        await b.commit();
+      } catch (ex) {
+        await deleteUser(cred.user).catch(() => {});
+        throw new Error('This Username Is Already Taken');
+      }
+      state.user = cred.user;
+      state.profile = await getUserDoc(cred.user.uid, true);
+      state.registering = false;
+      location.hash = '#/home';
+      route();
+    } catch (ex) { state.registering = false; fail(friendly(ex)); btn.disabled = false; }
+  } }, el('div', { class: 'field' }, el('label', {}, 'Username'), u), el('div', { class: 'field' }, el('label', {}, 'Password'), p), err, btn);
+  authCard(el('div', { class: 'big' }, 'HOPU'), el('div', { class: 'tag' }, 'REGISTER AND START THE FUN!'), form,
+    el('p', { class: 'alt' }, 'Already Have An Account? ', el('a', { href: '#/login' }, 'Log In')));
+}
+
+/* ---------- Main views ---------- */
+async function homeView(soft, tok) {
+  if (!soft) await loadGames();
+  if (tok !== state.tok) return;
+  const main = mount('home');
+  const input = el('input', { type: 'text', placeholder: 'Search...', maxlength: 40 });
+  input.value = state.search;
+  const box = el('div');
+  const draw = () => {
+    const q = state.search.trim().toLowerCase();
+    if (q) {
+      const res = state.games.filter(g => (g.nameLower || '').includes(q) || (state.users.get(g.ownerId)?.username || '').toLowerCase().includes(q));
+      box.replaceChildren(section('Search Results', res, 'No Games Found'));
+    } else {
+      const rec = [...state.games].sort((a, b) => a.r - b.r).slice(0, 24);
+      const score = g => (g.likes || 0) * 2 + (g.favs || 0) * 3 - (g.dislikes || 0);
+      const pop = [...state.games].sort((a, b) => score(b) - score(a)).slice(0, 24);
+      box.replaceChildren(section('Recommended', rec, 'No Games Yet, Be The First To Create One!'), section('Popular', pop, 'No Games Yet'), section('Favorites', favGames(state.profile), 'Tap The Star On A Game To Add It Here'));
+    }
+  };
+  input.addEventListener('input', () => { state.search = input.value; draw(); });
+  main.append(el('div', { class: 'head' }, el('h1', {}, 'Homepage'), el('div', { class: 'search' }, icon('search'), input)), box);
+  draw();
+}
+
+async function ownProfileView(soft, tok) {
+  if (!soft) { await loadGames(); state.profile = await getUserDoc(state.user.uid, true); }
+  if (tok !== state.tok) return;
+  const main = mount('profile'), p = state.profile;
+  let newAvatar = null;
+  const left = picker({ shape: 'round', dim: 240, src: p.avatar, letter: p.username[0].toUpperCase(), out: 192, onChange: d => { newAvatar = d; } });
+  const name = el('input', { type: 'text', maxlength: 16, autocomplete: 'off' });
+  name.value = p.username;
+  const left_ms = (p.lastNameChange?.toMillis?.() || 0) + WEEK - Date.now();
+  const hopu = p.username === 'Hopu';
+  const locked = hopu || left_ms > 0;
+  name.disabled = locked;
+  const days = Math.ceil(left_ms / 86400000);
+  const hint = hopu ? 'This Username Cannot Be Changed' : locked ? `You Can Change Your Username In ${days} ${days === 1 ? 'Day' : 'Days'}` : 'You Can Change Your Username Once Every 7 Days';
+  const desc = el('textarea', { maxlength: 150, placeholder: 'Tell Something About You... (Max 150 Characters)' });
+  desc.value = p.description || '';
+  const err = el('div', { class: 'err', style: 'display:none' });
+  const btn = el('button', { class: 'btn', onclick: async () => {
+    err.style.display = 'none';
+    const nn = name.value.trim(), patch = { description: desc.value.trim().slice(0, 150) };
+    if (newAvatar !== null) patch.avatar = newAvatar;
+    btn.disabled = true;
+    try {
+      const uid = state.user.uid, uref = doc(db, 'users', uid);
+      if (nn !== p.username) {
+        if (locked) throw new Error('You Cannot Change Your Username Yet');
+        if (!NAME_RE.test(nn)) throw new Error('Username: 3-16 Characters, Only Letters, Numbers And Underscore');
+        await runTransaction(db, async tx => {
+          const us = await tx.get(uref), old = us.data(), nl = nn.toLowerCase();
+          if (nl !== old.usernameLower) {
+            const nref = doc(db, 'usernames', nl);
+            if ((await tx.get(nref)).exists()) throw new Error('This Username Is Already Taken');
+            tx.set(nref, { uid, email: old.loginEmail, username: nn });
+            tx.delete(doc(db, 'usernames', old.usernameLower));
+          }
+          tx.update(uref, { ...patch, username: nn, usernameLower: nl, lastNameChange: serverTimestamp() });
+        });
+      } else await updateDoc(uref, patch);
+      state.profile = await getUserDoc(uid, true);
+      toast('Profile Saved');
+      rerender();
+    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; btn.disabled = false; }
+  } }, 'Save');
+  main.append(el('h1', { style: 'margin-bottom:22px' }, 'Profile'),
+    el('div', { class: 'prof' }, left,
+      el('div', { class: 'form' }, field('Username', name, hint), field('Description', desc, '', 150), err, btn)),
+    section('Games', state.games.filter(g => g.ownerId === state.user.uid), "You Haven't Created Any Games Yet"),
+    section('Favorites', favGames(p), 'No Favorite Games Yet'));
+}
+
+async function publicProfileView(soft, tok, uid) {
+  if (!soft) await loadGames();
+  const u = await getUserDoc(uid, !soft);
+  if (tok !== state.tok) return;
+  const main = mount('');
+  if (!u) { main.append(el('h1', {}, 'Player Not Found')); return; }
+  main.append(
+    el('div', { class: 'prof' }, avatar(u, 220),
+      el('div', {}, el('div', { class: 'name' }, u.username),
+        el('div', { class: 'meta' }, 'Account Created: ', fmtDate(u.createdAt)),
+        u.description ? el('div', { class: 'desc' }, u.description) : el('div', { class: 'muted' }, 'No Description Yet'))),
+    section('Games', state.games.filter(g => g.ownerId === uid), 'No Games Yet'),
+    section('Favorites', favGames(u), 'No Favorite Games Yet'));
+}
+
+async function newsView(soft, tok) {
+  if (!soft) {
+    const s = await getDocs(query(collection(db, 'news'), orderBy('createdAt', 'desc'), limit(50)));
+    state.news = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    await Promise.all([...new Set(state.news.map(n => n.authorId))].map(x => getUserDoc(x, true)));
+  }
+  if (tok !== state.tok) return;
+  const main = mount('news');
+  main.append(el('h1', { style: 'margin-bottom:22px' }, 'News'));
+  if (!state.news.length) main.append(el('p', { class: 'muted' }, 'No News Yet'));
+  for (const n of state.news) {
+    main.append(el('div', { class: 'post' },
+      el('div', { class: 'who' }, (state.users.get(n.authorId)?.username || 'Hopu') + ':'),
+      el('div', { class: 'txt' }, n.text),
+      el('div', { class: 'when' }, el('span', {}, fmtDate(n.createdAt)),
+        isAdmin() ? el('button', { class: 'btn pill small', onclick: async () => {
+          if (!await ask('Delete News', 'Delete This Post?')) return;
+          try { await deleteDoc(doc(db, 'news', n.id)); state.news = state.news.filter(x => x.id !== n.id); rerender(); } catch (e) { toast(friendly(e)); }
+        } }, icon('trash'), 'Delete') : null)));
+  }
+  if (isAdmin()) main.append(el('button', { class: 'btn fab', onclick: openNewsModal }, 'Create'));
+}
+function openNewsModal() {
+  const t = el('textarea', { maxlength: 500, placeholder: 'Write Something For Everyone...' });
+  const f = field('New Post', t, '', 500);
+  const post = el('button', { class: 'btn dark', onclick: async () => {
+    const text = t.value.trim(); if (!text) return toast('Write Something First');
+    post.disabled = true;
+    try {
+      await addDoc(collection(db, 'news'), { text, authorId: state.user.uid, createdAt: serverTimestamp() });
+      ov.remove(); toast('Posted'); route();
+    } catch (e) { toast(friendly(e)); post.disabled = false; }
+  } }, 'Post');
+  const ov = el('div', { class: 'overlay', onclick: e => { if (e.target === ov) ov.remove(); } },
+    el('div', { class: 'modal' }, f, el('div', { class: 'mbtns' }, el('button', { class: 'btn', onclick: () => ov.remove() }, 'Cancel'), post)));
+  document.body.append(ov);
+}
+
+async function createView(soft, tok) {
+  if (!soft) await loadGames();
+  if (tok !== state.tok) return;
+  const main = mount('create');
+  const mine = state.games.filter(g => g.ownerId === state.user.uid);
+  main.append(el('h1', {}, 'Create'), el('h2', { style: 'margin:14px 0 14px' }, 'Your Games'));
+  if (!mine.length) main.append(el('p', { class: 'muted' }, "You Haven't Created Any Games Yet"));
+  for (const g of mine) {
+    main.append(el('div', { class: 'mine' }, tile(g), el('div', {},
+      el('div', { class: 'gname' }, g.name),
+      el('button', { class: 'btn pill', onclick: () => { location.hash = `#/game/${g.id}/edit`; } }, 'Edit'))));
+  }
+  main.append(el('button', { class: 'btn fab', onclick: () => { location.hash = '#/game/new'; } }, 'Create'));
+}
+
+function normalizeLink(v) {
+  let s = v.trim(); if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try { const u = new URL(s); if (!/^https?:$/.test(u.protocol) || !u.hostname.includes('.')) return null; return u.href.slice(0, 300); } catch { return null; }
+}
+async function gameEditorView(soft, tok, id) {
+  if (!soft) await loadGames();
+  if (tok !== state.tok) return;
+  let g = null;
+  if (id) { g = state.games.find(x => x.id === id); if (!g || g.ownerId !== state.user.uid) { location.hash = '#/create'; return; } }
+  const main = mount('create');
+  let iconData = g?.icon || '';
+  const pick = picker({ shape: 'sq', dim: 210, src: iconData, letter: '', out: 256, onChange: d => { iconData = d; } });
+  const name = el('input', { type: 'text', maxlength: 30, placeholder: 'Game Name' });
+  const link = el('input', { type: 'text', maxlength: 300, placeholder: 'https://...' });
+  name.value = g?.name || ''; link.value = g?.link || '';
+  const err = el('div', { class: 'err', style: 'display:none' });
+  const save = el('button', { class: 'btn', onclick: async () => {
+    err.style.display = 'none';
+    const nm = name.value.trim(), lk = normalizeLink(link.value);
+    const bad = m => { err.textContent = m; err.style.display = 'block'; };
+    if (!nm) return bad('Please Enter A Game Name');
+    if (!lk) return bad('Please Enter A Valid Link');
+    if (!g && state.games.filter(x => x.ownerId === state.user.uid).length >= 25) return bad('You Can Create Up To 25 Games');
+    save.disabled = true;
+    try {
+      if (g) await updateDoc(doc(db, 'games', g.id), { name: nm, nameLower: nm.toLowerCase(), link: lk, icon: iconData });
+      else await addDoc(collection(db, 'games'), { name: nm, nameLower: nm.toLowerCase(), link: lk, icon: iconData, ownerId: state.user.uid, createdAt: serverTimestamp(), likes: 0, dislikes: 0, favs: 0 });
+      toast(g ? 'Game Saved' : 'Game Created');
+      location.hash = '#/create';
+    } catch (e) { bad(friendly(e)); save.disabled = false; }
+  } }, g ? 'Save' : 'Create');
+  main.append(el('h1', { style: 'margin-bottom:24px' }, 'Game'),
+    el('div', { class: 'prof' }, pick,
+      el('div', { class: 'form' }, field('Name', name, '', 30), field('Link', link, 'Players Will Open This Link In A New Tab', 300), err,
+        el('div', { class: 'acts' }, save,
+          el('button', { class: 'btn', onclick: () => { location.hash = '#/create'; } }, 'Cancel'),
+          g ? el('button', { class: 'btn', onclick: async () => { await removeGame(g); if (!state.games.find(x => x.id === g.id)) location.hash = '#/create'; } }, icon('trash'), 'Delete') : null))));
+}
+
+/* ---------- Router ---------- */
+async function route() {
+  if (!state.ready) return;
+  const tok = ++state.tok, h = location.hash || '';
+  try {
+    if (!state.user) { return h === '#/register' ? registerView() : loginView(); }
+    let m;
+    if (!h || h === '#/login' || h === '#/register') { location.hash = '#/home'; return; }
+    if (h === '#/home') return await homeView(false, tok);
+    if (h === '#/profile') return await ownProfileView(false, tok);
+    if (h === '#/news') return await newsView(false, tok);
+    if (h === '#/create') return await createView(false, tok);
+    if (h === '#/game/new') return await gameEditorView(false, tok, null);
+    if ((m = h.match(/^#\/game\/([^/]+)\/edit$/))) return await gameEditorView(false, tok, m[1]);
+    if ((m = h.match(/^#\/user\/([^/]+)$/))) {
+      if (m[1] === state.user.uid) { location.hash = '#/profile'; return; }
+      return await publicProfileView(false, tok, m[1]);
+    }
+    location.hash = '#/home';
+  } catch (e) { toast(friendly(e)); console.error(e); }
+}
+async function rerender() {
+  if (!state.user || !state.profile) return;
+  const y = window.scrollY, tok = ++state.tok, h = location.hash;
+  let m;
+  try {
+    if (h === '#/home') await homeView(true, tok);
+    else if (h === '#/profile') await ownProfileView(true, tok);
+    else if (h === '#/news') await newsView(true, tok);
+    else if (h === '#/create') await createView(true, tok);
+    else if (h === '#/game/new') await gameEditorView(true, tok, null);
+    else if ((m = h.match(/^#\/game\/([^/]+)\/edit$/))) await gameEditorView(true, tok, m[1]);
+    else if ((m = h.match(/^#\/user\/([^/]+)$/))) await publicProfileView(true, tok, m[1]);
+    window.scrollTo(0, y);
+  } catch (e) { console.error(e); }
+}
+
+window.addEventListener('hashchange', () => route());
+onAuthStateChanged(auth, async u => {
+  if (state.registering) return;
+  state.user = u; state.profile = null;
+  if (u) {
+    try { state.profile = await getUserDoc(u.uid, true); } catch (e) { console.error(e); }
+    if (!state.profile) { await signOut(auth); return; }
+  }
+  state.ready = true;
+  route();
+});
+</script>
+</body>
+</html>
