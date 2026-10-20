@@ -30,23 +30,26 @@ p{margin:0}
 .me:hover{background:var(--soft)}
 .mename{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
 .nav{display:flex;flex-direction:column;gap:6px}
-.nav a,.logout{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:3px solid transparent;text-decoration:none;font-size:21px;font-weight:500;background:none;cursor:pointer;transition:.15s}
-.nav a .ico,.logout .ico{width:30px;height:30px}
-.nav a:hover,.logout:hover{border-color:var(--ink)}
+.nav a,.logout,.snd{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:3px solid transparent;text-decoration:none;font-size:21px;font-weight:500;background:none;cursor:pointer;transition:.15s}
+.nav a .ico,.logout .ico,.snd .ico{width:30px;height:30px}
+.nav a:hover,.logout:hover,.snd:hover{border-color:var(--ink)}
+.nav a:active,.logout:active,.snd:active{transform:scale(.95);transition-duration:.04s}
 .nav a.on{background:var(--ink);color:var(--paper)}
-.logout{margin-top:auto;width:100%;text-align:left}
+.snd{margin-top:auto;width:100%;text-align:left}
+.logout{width:100%;text-align:left}
+.pwcard{max-width:640px;margin-bottom:34px}
 .main{padding:28px 40px 130px;min-width:0}
 .head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
 .sec{margin-bottom:30px}
 
 /* Buttons and fields */
-.btn{border:3px solid var(--ink);background:var(--paper);color:var(--ink);padding:9px 28px;font-size:22px;font-weight:600;cursor:pointer;border-radius:8px;box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s,background .12s,color .12s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:var(--ink);color:var(--paper)}
-.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn{border:3px solid var(--ink);background:var(--paper);color:var(--ink);padding:9px 28px;font-size:22px;font-weight:600;cursor:pointer;border-radius:8px;--s:4px;box-shadow:var(--s) var(--s) 0 var(--ink);transition:transform .12s,box-shadow .12s,background .12s,color .12s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:calc(var(--s) + 2px) calc(var(--s) + 2px) 0 var(--ink);background:var(--ink);color:var(--paper)}
+.btn:active{transform:translate(var(--s),var(--s));box-shadow:0 0 0 var(--ink);transition-duration:.04s}
 .btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 .btn.dark{background:var(--ink);color:var(--paper)}
 .btn.dark:hover{background:var(--paper);color:var(--ink)}
-.btn.pill{border-radius:18px;padding:5px 24px;font-size:20px;box-shadow:3px 3px 0 var(--ink)}
+.btn.pill{border-radius:18px;padding:5px 24px;font-size:20px;--s:3px}
 .btn.small{font-size:16px;padding:3px 14px}
 .btn.wide{width:100%}
 .fab{position:fixed;right:34px;bottom:28px;z-index:5;background:var(--paper)}
@@ -79,9 +82,11 @@ p{margin:0}
 
 /* Game cards */
 .rowwrap{position:relative}
-.row{display:flex;gap:30px;overflow-x:auto;padding:6px 8px 16px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--ink) transparent}
+.row{display:flex;gap:30px;overflow-x:auto;padding:10px 14px 22px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--ink) transparent}
 .rarrow{position:absolute;right:4px;top:50px;width:60px;height:46px;border:3px solid var(--ink);background:var(--paper);border-radius:10px;display:none;place-items:center;cursor:pointer;box-shadow:3px 3px 0 var(--ink);z-index:2}
-.rarrow:hover{background:var(--ink);color:var(--paper)}
+.rarrow{transition:transform .12s,box-shadow .12s,background .12s,color .12s}
+.rarrow:hover{background:var(--ink);color:var(--paper);transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+.rarrow:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);transition-duration:.04s}
 .rarrow .ico{width:30px;height:30px}
 .card{display:flex;gap:14px;flex:0 0 auto;width:330px}
 .card .info{min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -92,6 +97,7 @@ p{margin:0}
 .stats{display:flex;gap:12px;margin:3px 0 6px}
 .stat{display:flex;align-items:center;gap:4px;background:none;border:0;padding:2px 2px;cursor:pointer;font-size:19px;font-weight:600;transition:transform .12s}
 .stat:hover{transform:scale(1.15)}
+.stat:active{transform:scale(.85);transition-duration:.04s}
 .stat.on .ico svg{fill:currentColor}
 .stat.down .ico{transform:rotate(180deg) scaleX(-1)}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
@@ -139,9 +145,10 @@ p{margin:0}
   .logo{font-size:34px}
   .me{margin:0}.mename{max-width:110px}
   .nav{flex-direction:row;flex-wrap:wrap;width:100%;order:5}
-  .nav a,.logout{font-size:17px;padding:6px 10px}
-  .nav a .ico,.logout .ico{width:24px;height:24px}
-  .logout{margin:0 0 0 auto;width:auto}
+  .nav a,.logout,.snd{font-size:17px;padding:6px 10px}
+  .nav a .ico,.logout .ico,.snd .ico{width:24px;height:24px}
+  .snd{margin:0 0 0 auto;width:auto}
+  .logout{margin:0;width:auto}
   .main{padding:20px 16px 120px}
   h1{font-size:34px}
   .card{width:300px}
@@ -155,7 +162,7 @@ p{margin:0}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, setPersistence, browserLocalPersistence, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 /* ============================================================
@@ -196,7 +203,9 @@ const ICONS = {
   home: '<path d="M3 11.5 12 3.5l9 8"/><path d="M5.5 10v10h13V10"/>',
   user: '<circle cx="12" cy="7" r="4"/><rect x="6" y="14" width="12" height="7" rx="3"/>',
   news: '<path d="M4 5h16v11h-9.5L6 20.5V16H4z"/>',
-  create: '<path d="M13 3.5l7.5 7.5-3.2 3.2L9.800 6.700z"/><path d="M12.200 11.500 4.500 19.500"/>',
+  create: '<g transform="rotate(45 12 12)"><rect x="4.500" y="3" width="15" height="5.500" rx="1.500"/><rect x="10.500" y="8.500" width="3" height="12.500" rx="1"/></g>',
+  sound: '<path d="M4 9.500h4l5-4v13l-5-4H4z"/><path d="M16.500 9a4 4 0 0 1 0 6M19 6.500a8 8 0 0 1 0 11"/>',
+  mute: '<path d="M4 9.500h4l5-4v13l-5-4H4z"/><path d="M17 9.500l5 5M22 9.500l-5 5"/>',
   star: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
   up: '<path d="M7 11v9H3.500v-9z"/><path d="M7 11l4-8c1.600 0 2.700 1.100 2.700 2.700V9H19a2 2 0 0 1 2 2.300l-1.200 7A2 2 0 0 1 17.800 20H7"/>',
   camera: '<path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.500" r="3.800"/>',
@@ -207,7 +216,58 @@ const ICONS = {
 };
 const icon = (n) => el('span', { class: 'ico', html: `<svg viewBox="0 0 24 24">${ICONS[n]}</svg>` });
 
-function toast(msg) {
+/* ---------- Sound effects (synthesized, no files needed) ---------- */
+const sfx = (() => {
+  let ctx = null, muted = false, lastHover = 0;
+  try { muted = localStorage.getItem('hopuMuted') === '1'; } catch {}
+  const get = () => {
+    if (muted) return null;
+    try {
+      if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    } catch { return null; }
+  };
+  const tone = (c, f, t, d, type = 'sine', v = .1, to = null) => {
+    const o = c.createOscillator(), g = c.createGain(), s = c.currentTime + t;
+    o.type = type; o.frequency.setValueAtTime(f, s);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, s + d);
+    g.gain.setValueAtTime(0.0001, s);
+    g.gain.exponentialRampToValueAtTime(v, s + .012);
+    g.gain.exponentialRampToValueAtTime(0.0001, s + d);
+    o.connect(g); g.connect(c.destination); o.start(s); o.stop(s + d + .03);
+  };
+  const seq = (notes, type, v, step = .08, d = .16) => () => { const c = get(); if (c) notes.forEach((f, i) => tone(c, f, i * step, d, type, v)); };
+  return {
+    get muted() { return muted; },
+    set(m) { muted = m; try { localStorage.setItem('hopuMuted', m ? '1' : '0'); } catch {} },
+    click() { const c = get(); if (c) tone(c, 540, 0, .08, 'triangle', .13, 320); },
+    hover() { const n = Date.now(); if (n - lastHover < 80) return; lastHover = n; const c = get(); if (c) tone(c, 1000, 0, .03, 'sine', .02); },
+    ok: seq([660, 990], 'triangle', .12),
+    err() { const c = get(); if (c) { tone(c, 220, 0, .2, 'sawtooth', .07, 140); tone(c, 165, .1, .22, 'sawtooth', .07, 110); } },
+    up: seq([523, 659, 784], 'triangle', .12, .07),
+    down: seq([440, 349, 262], 'triangle', .12, .08),
+    fav: seq([880, 1175, 1568, 2093], 'sine', .1, .06, .2),
+    play() { const c = get(); if (c) { tone(c, 300, 0, .28, 'square', .06, 900); tone(c, 600, .12, .22, 'triangle', .1, 1200); } },
+    del() { const c = get(); if (c) tone(c, 420, 0, .22, 'square', .06, 90); },
+    logout: seq([660, 494, 392], 'triangle', .11, .09, .18),
+    welcome: seq([523, 659, 784, 1047], 'triangle', .12, .09, .22)
+  };
+})();
+const SND_SEL = '.btn,.nav a,.logout,.snd,.stat,.rarrow,.logo,.me,.picker';
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest?.(SND_SEL);
+  if (!b || b.disabled) return;
+  (sfx[b.dataset.snd] || sfx.click)();
+});
+document.addEventListener('pointerover', e => {
+  if (e.pointerType !== 'mouse') return;
+  const b = e.target.closest?.(SND_SEL);
+  if (b && !b.disabled && !b.contains(e.relatedTarget)) sfx.hover();
+});
+
+function toast(msg, kind) {
+  sfx[kind === 'err' ? 'err' : 'ok']();
   const t = el('div', { class: 'toast' }, msg);
   document.getElementById('toasts').append(t);
   setTimeout(() => t.remove(), 3200);
@@ -257,6 +317,8 @@ if (!configured) {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+/* Keep the user signed in between visits (survives closing the browser) */
+await setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence', e));
 
 /* ---------- State ---------- */
 const state = { user: null, profile: null, games: [], news: [], users: new Map(), tok: 0, ready: false, registering: false, busy: false, search: '' };
@@ -309,7 +371,7 @@ function picker({ shape, dim, src, letter, out, onChange }) {
   box.addEventListener('click', () => file.click());
   file.addEventListener('change', async () => {
     const f = file.files[0]; if (!f) return;
-    try { const d = await resizeImage(f, out); render(d); onChange(d); } catch (e) { toast(e.message); }
+    try { const d = await resizeImage(f, out); render(d); onChange(d); } catch (e) { toast(e.message, 'err'); }
     file.value = '';
   });
   return box;
@@ -349,7 +411,7 @@ async function react(g, kind) {
     });
     Object.assign(g, out);
     state.profile = await getUserDoc(uid, true);
-  } catch (e) { toast(friendly(e)); }
+  } catch (e) { toast(friendly(e), 'err'); }
   state.busy = false;
   rerender();
 }
@@ -360,7 +422,7 @@ async function removeGame(g) {
     state.games = state.games.filter(x => x.id !== g.id);
     toast('Game Deleted');
     rerender();
-  } catch (e) { toast(friendly(e)); }
+  } catch (e) { toast(friendly(e), 'err'); }
 }
 function play(g) { window.open(g.link, '_blank', 'noopener'); }
 
@@ -368,15 +430,15 @@ function gameCard(g) {
   const owner = state.users.get(g.ownerId);
   const fav = (state.profile?.favorites || []).includes(g.id);
   const vote = (state.profile?.votes || {})[g.id] || 0;
-  const stat = (ic, n, on, cls, kind) => el('button', { class: `stat ${cls || ''} ${on ? 'on' : ''}`, onclick: () => react(g, kind) }, icon(ic), String(n || 0));
+  const stat = (ic, n, on, cls, kind) => el('button', { class: `stat ${cls || ''} ${on ? 'on' : ''}`, 'data-snd': kind, onclick: () => react(g, kind) }, icon(ic), String(n || 0));
   return el('div', { class: 'card' }, tile(g),
     el('div', { class: 'info' },
       el('div', { class: 'gname', title: g.name }, g.name),
       el('div', { class: 'by' }, 'By ', el('a', { href: g.ownerId === state.user.uid ? '#/profile' : `#/user/${g.ownerId}` }, owner?.username || 'Unknown')),
       el('div', { class: 'stats' }, stat('star', g.favs, fav, '', 'fav'), stat('up', g.likes, vote === 1, '', 'up'), stat('up', g.dislikes, vote === -1, 'down', 'down')),
       el('div', { class: 'acts' },
-        el('button', { class: 'btn pill', onclick: () => play(g) }, 'Play'),
-        isAdmin() ? el('button', { class: 'btn pill small', onclick: () => removeGame(g) }, icon('trash'), 'Delete') : null)));
+        el('button', { class: 'btn pill', 'data-snd': 'play', onclick: () => play(g) }, 'Play'),
+        isAdmin() ? el('button', { class: 'btn pill small', 'data-snd': 'del', onclick: () => removeGame(g) }, icon('trash'), 'Delete') : null)));
 }
 function section(title, games, empty) {
   const sec = el('section', { class: 'sec' }, el('h2', {}, title));
@@ -395,11 +457,16 @@ const favGames = p => (p.favorites || []).map(id => state.games.find(g => g.id =
 function mount(active) {
   const p = state.profile;
   const nav = [['home', 'Homepage', 'home'], ['profile', 'Profile', 'user'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
+  const sndLabel = () => [icon(sfx.muted ? 'mute' : 'sound'), el('span', {}, sfx.muted ? 'Sound: Off' : 'Sound: On')];
+  const snd = el('button', { class: 'snd', 'aria-label': 'Toggle sound' });
+  snd.append(...sndLabel());
+  snd.addEventListener('click', () => { sfx.set(!sfx.muted); snd.replaceChildren(...sndLabel()); if (!sfx.muted) sfx.click(); });
   const side = el('aside', { class: 'side' },
     el('a', { class: 'logo', href: '#/home' }, 'HOPU'),
     el('a', { class: 'me', href: '#/profile' }, avatar(p, 40), el('span', { class: 'mename' }, p.username)),
     el('nav', { class: 'nav' }, nav.map(([k, l, i]) => el('a', { href: '#/' + k, class: k === active ? 'on' : '' }, icon(i), el('span', {}, l)))),
-    el('button', { class: 'logout', onclick: () => signOut(auth) }, icon('logout'), el('span', {}, 'Log Out')));
+    snd,
+    el('button', { class: 'logout', 'data-snd': 'logout', onclick: () => signOut(auth) }, icon('logout'), el('span', {}, 'Log Out')));
   const main = el('main', { class: 'main' });
   app.replaceChildren(el('div', { class: 'shell' }, side, main));
   return main;
@@ -416,13 +483,13 @@ function loginView() {
   const form = el('form', { onsubmit: async e => {
     e.preventDefault(); err.style.display = 'none';
     const name = u.value.trim().toLowerCase();
-    if (!name || !p.value) { err.textContent = 'Enter Your Username And Password'; err.style.display = 'block'; return; }
+    if (!name || !p.value) { err.textContent = 'Enter Your Username And Password'; err.style.display = 'block'; sfx.err(); return; }
     btn.disabled = true;
     try {
       const s = await getDoc(doc(db, 'usernames', name));
       if (!s.exists()) throw { code: 'auth/invalid-credential' };
       await signInWithEmailAndPassword(auth, s.data().email, p.value);
-    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; btn.disabled = false; }
+    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; sfx.err(); btn.disabled = false; }
   } }, el('div', { class: 'field' }, u), el('div', { class: 'field' }, p), err, btn);
   authCard(el('h1', {}, 'Log In To The Hopu Platform'), form,
     el('p', { class: 'alt' }, "Don't You Have An Account? ", el('a', { href: '#/register' }, 'Register')));
@@ -433,7 +500,7 @@ function registerView() {
   const p = el('input', { type: 'password', placeholder: 'At Least 8 Characters', maxlength: 64, autocomplete: 'new-password' });
   const err = el('div', { class: 'err', style: 'display:none' });
   const btn = el('button', { class: 'btn wide', type: 'submit' }, 'Register');
-  const fail = m => { err.textContent = m; err.style.display = 'block'; };
+  const fail = m => { err.textContent = m; err.style.display = 'block'; sfx.err(); };
   const form = el('form', { onsubmit: async e => {
     e.preventDefault(); err.style.display = 'none';
     const name = u.value.trim();
@@ -461,6 +528,7 @@ function registerView() {
       state.user = cred.user;
       state.profile = await getUserDoc(cred.user.uid, true);
       state.registering = false;
+      sfx.welcome();
       location.hash = '#/home';
       route();
     } catch (ex) { state.registering = false; fail(friendly(ex)); btn.disabled = false; }
@@ -492,6 +560,36 @@ async function homeView(soft, tok) {
   input.addEventListener('input', () => { state.search = input.value; draw(); });
   main.append(el('div', { class: 'head' }, el('h1', {}, 'Homepage'), el('div', { class: 'search' }, icon('search'), input)), box);
   draw();
+}
+
+function pwCard() {
+  const o = el('input', { type: 'password', maxlength: 64, autocomplete: 'current-password', placeholder: 'Your Current Password' });
+  const n = el('input', { type: 'password', maxlength: 64, autocomplete: 'new-password', placeholder: 'At Least 8 Characters' });
+  const c = el('input', { type: 'password', maxlength: 64, autocomplete: 'new-password', placeholder: 'Repeat The New Password' });
+  const err = el('div', { class: 'err', style: 'display:none' });
+  const btn = el('button', { class: 'btn', type: 'submit' }, 'Change Password');
+  const bad = m => { err.textContent = m; err.style.display = 'block'; sfx.err(); };
+  return el('form', { class: 'pwcard', onsubmit: async e => {
+    e.preventDefault(); err.style.display = 'none';
+    if (!o.value) return bad('Enter Your Current Password');
+    if (n.value.length < 8) return bad('New Password Must Have At Least 8 Characters');
+    if (n.value !== c.value) return bad('New Passwords Do Not Match');
+    if (n.value === o.value) return bad('New Password Must Be Different From The Old One');
+    btn.disabled = true;
+    try {
+      const u = auth.currentUser;
+      await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, o.value));
+      await updatePassword(u, n.value);
+      o.value = ''; n.value = ''; c.value = '';
+      toast('Password Changed');
+    } catch (ex) {
+      const k = ex?.code || '';
+      bad(k === 'auth/invalid-credential' || k === 'auth/wrong-password' ? 'Your Current Password Is Wrong'
+        : k === 'auth/weak-password' ? 'New Password Is Too Weak' : friendly(ex));
+    }
+    btn.disabled = false;
+  } }, el('h2', {}, 'Change Password'),
+    field('Current Password', o), field('New Password', n), field('Repeat New Password', c), err, btn);
 }
 
 async function ownProfileView(soft, tok) {
@@ -535,11 +633,12 @@ async function ownProfileView(soft, tok) {
       state.profile = await getUserDoc(uid, true);
       toast('Profile Saved');
       rerender();
-    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; btn.disabled = false; }
+    } catch (ex) { err.textContent = friendly(ex); err.style.display = 'block'; sfx.err(); btn.disabled = false; }
   } }, 'Save');
   main.append(el('h1', { style: 'margin-bottom:22px' }, 'Profile'),
     el('div', { class: 'prof' }, left,
       el('div', { class: 'form' }, field('Username', name, hint), field('Description', desc, '', 150), err, btn)),
+    pwCard(),
     section('Games', state.games.filter(g => g.ownerId === state.user.uid), "You Haven't Created Any Games Yet"),
     section('Favorites', favGames(p), 'No Favorite Games Yet'));
 }
@@ -574,9 +673,9 @@ async function newsView(soft, tok) {
       el('div', { class: 'who' }, (state.users.get(n.authorId)?.username || 'Hopu') + ':'),
       el('div', { class: 'txt' }, n.text),
       el('div', { class: 'when' }, el('span', {}, fmtDate(n.createdAt)),
-        isAdmin() ? el('button', { class: 'btn pill small', onclick: async () => {
+        isAdmin() ? el('button', { class: 'btn pill small', 'data-snd': 'del', onclick: async () => {
           if (!await ask('Delete News', 'Delete This Post?')) return;
-          try { await deleteDoc(doc(db, 'news', n.id)); state.news = state.news.filter(x => x.id !== n.id); rerender(); } catch (e) { toast(friendly(e)); }
+          try { await deleteDoc(doc(db, 'news', n.id)); state.news = state.news.filter(x => x.id !== n.id); rerender(); } catch (e) { toast(friendly(e), 'err'); }
         } }, icon('trash'), 'Delete') : null)));
   }
   if (isAdmin()) main.append(el('button', { class: 'btn fab', onclick: openNewsModal }, 'Create'));
@@ -585,12 +684,12 @@ function openNewsModal() {
   const t = el('textarea', { maxlength: 500, placeholder: 'Write Something For Everyone...' });
   const f = field('New Post', t, '', 500);
   const post = el('button', { class: 'btn dark', onclick: async () => {
-    const text = t.value.trim(); if (!text) return toast('Write Something First');
+    const text = t.value.trim(); if (!text) return toast('Write Something First', 'err');
     post.disabled = true;
     try {
       await addDoc(collection(db, 'news'), { text, authorId: state.user.uid, createdAt: serverTimestamp() });
       ov.remove(); toast('Posted'); route();
-    } catch (e) { toast(friendly(e)); post.disabled = false; }
+    } catch (e) { toast(friendly(e), 'err'); post.disabled = false; }
   } }, 'Post');
   const ov = el('div', { class: 'overlay', onclick: e => { if (e.target === ov) ov.remove(); } },
     el('div', { class: 'modal' }, f, el('div', { class: 'mbtns' }, el('button', { class: 'btn', onclick: () => ov.remove() }, 'Cancel'), post)));
@@ -632,7 +731,7 @@ async function gameEditorView(soft, tok, id) {
   const save = el('button', { class: 'btn', onclick: async () => {
     err.style.display = 'none';
     const nm = name.value.trim(), lk = normalizeLink(link.value);
-    const bad = m => { err.textContent = m; err.style.display = 'block'; };
+    const bad = m => { err.textContent = m; err.style.display = 'block'; sfx.err(); };
     if (!nm) return bad('Please Enter A Game Name');
     if (!lk) return bad('Please Enter A Valid Link');
     if (!g && state.games.filter(x => x.ownerId === state.user.uid).length >= 25) return bad('You Can Create Up To 25 Games');
@@ -649,7 +748,7 @@ async function gameEditorView(soft, tok, id) {
       el('div', { class: 'form' }, field('Name', name, '', 30), field('Link', link, 'Players Will Open This Link In A New Tab', 300), err,
         el('div', { class: 'acts' }, save,
           el('button', { class: 'btn', onclick: () => { location.hash = '#/create'; } }, 'Cancel'),
-          g ? el('button', { class: 'btn', onclick: async () => { await removeGame(g); if (!state.games.find(x => x.id === g.id)) location.hash = '#/create'; } }, icon('trash'), 'Delete') : null))));
+          g ? el('button', { class: 'btn', 'data-snd': 'del', onclick: async () => { await removeGame(g); if (!state.games.find(x => x.id === g.id)) location.hash = '#/create'; } }, icon('trash'), 'Delete') : null))));
 }
 
 /* ---------- Router ---------- */
@@ -671,7 +770,7 @@ async function route() {
       return await publicProfileView(false, tok, m[1]);
     }
     location.hash = '#/home';
-  } catch (e) { toast(friendly(e)); console.error(e); }
+  } catch (e) { toast(friendly(e), 'err'); console.error(e); }
 }
 async function rerender() {
   if (!state.user || !state.profile) return;
@@ -692,10 +791,22 @@ async function rerender() {
 window.addEventListener('hashchange', () => route());
 onAuthStateChanged(auth, async u => {
   if (state.registering) return;
+  const fresh = u && state.ready && !state.user;
   state.user = u; state.profile = null;
   if (u) {
-    try { state.profile = await getUserDoc(u.uid, true); } catch (e) { console.error(e); }
-    if (!state.profile) { await signOut(auth); return; }
+    let failed = false;
+    try { state.profile = await getUserDoc(u.uid, true); } catch (e) { failed = true; console.error(e); }
+    if (!state.profile) {
+      if (failed) {
+        /* network/Firestore hiccup: stay signed in and let the user retry */
+        app.replaceChildren(el('div', { class: 'setup' }, el('h1', {}, 'Connection Problem'),
+          el('p', { style: 'margin:16px 0;font-size:20px' }, 'Could Not Load Your Profile. You Are Still Signed In.'),
+          el('button', { class: 'btn', onclick: () => location.reload() }, 'Try Again')));
+        return;
+      }
+      await signOut(auth); return;
+    }
+    if (fresh) sfx.welcome();
   }
   state.ready = true;
   route();
