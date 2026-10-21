@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
 <title>Hopu</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='45' font-size='38' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23fff'%3EH%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,6 +114,12 @@ p{margin:0}
 .prof .meta{font-size:18px;color:var(--muted);margin:2px 0 14px}
 .prof .desc{font-size:20px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
 
+/* Friends */
+.person{display:flex;align-items:center;gap:14px;border:3px solid var(--ink);border-radius:22px;padding:10px 16px;margin-bottom:14px;max-width:640px;box-shadow:4px 4px 0 var(--ink)}
+.pname{flex:1;min-width:0;font-size:24px;font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pname:hover{text-decoration:underline;text-decoration-thickness:3px}
+.person .btn.small{font-size:17px;padding:5px 16px}
+
 /* News */
 .post{border:3px solid var(--ink);border-radius:22px;padding:16px 22px;margin-bottom:18px;max-width:760px;box-shadow:5px 5px 0 var(--ink)}
 .post .who{font-size:28px;font-weight:700}
@@ -141,19 +148,88 @@ p{margin:0}
 .setup{max-width:640px;margin:60px auto;padding:0 20px}
 .setup code{background:var(--soft);padding:2px 8px;border-radius:8px}
 
+html{-webkit-text-size-adjust:100%}
+button,a,.picker{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+/* Touch devices: no sticky hover states */
+@media (hover:none){
+  .btn:hover{transform:none;box-shadow:var(--s) var(--s) 0 var(--ink);background:var(--paper);color:var(--ink)}
+  .btn.dark:hover{background:var(--ink);color:var(--paper)}
+  .btn:active{transform:translate(var(--s),var(--s));box-shadow:0 0 0 var(--ink)}
+  .btn.dark:active{background:var(--ink);color:var(--paper)}
+  .nav a:hover,.logout:hover{border-color:transparent}
+  .nav a.on:hover{background:var(--ink);color:var(--paper)}
+  .me:hover{background:none}
+  .stat:hover{transform:none}
+  .by a:hover,.auth-card .alt a:hover{background:none;color:inherit}
+  .rarrow{display:none!important}
+  .row{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .card{scroll-snap-align:start}
+}
+
 @media (max-width:820px){
+  html,body{font-size:17px}
   .shell{grid-template-columns:1fr}
-  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:3px solid var(--ink);gap:4px 10px}
-  .logo{font-size:34px}
-  .me{margin:0}.mename{max-width:110px}
-  .nav{flex-direction:row;flex-wrap:wrap;width:100%;order:5}
-  .nav a,.logout{font-size:17px;padding:6px 10px}
-  .nav a .ico,.logout .ico{width:24px;height:24px}
-  .logout{margin:0 0 0 auto;width:auto}
-  .main{padding:20px 16px 120px}
-  h1{font-size:34px}
-  .card{width:300px}
-  .fab{right:16px;bottom:16px}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;border-right:0;border-bottom:3px solid var(--ink);gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
+  .logo{font-size:32px;margin:0}
+  .me{margin:0 0 0 auto;padding:4px 8px;font-size:18px}
+  .mename{max-width:120px}
+  .logout{margin:0;width:auto;padding:6px;border-width:2px}
+  .logout span:not(.ico){display:none}
+  .logout .ico{width:28px;height:28px}
+  /* bottom tab bar */
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;flex-direction:row;gap:4px;background:var(--paper);border-top:3px solid var(--ink);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+  .nav a{flex:1;flex-direction:column;gap:1px;padding:6px 2px 4px;font-size:13px;font-weight:600;border-radius:14px;border-width:0;text-align:center;min-width:0}
+  .nav a .ico{width:28px;height:28px}
+  .nav a span:not(.ico){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  .main{padding:18px 16px calc(110px + env(safe-area-inset-bottom))}
+  .head{margin-bottom:16px;gap:12px}
+  .search{width:100%}
+  h1{font-size:30px}
+  h2{font-size:23px}
+  .sec{margin-bottom:22px}
+  .row{gap:16px;padding:8px 4px 16px;margin:0 -4px}
+  .card{width:min(320px,84vw);gap:12px}
+  .tile{width:92px;height:92px;border-radius:18px}
+  .tile .tl{font-size:42px}
+  .gname{font-size:21px}
+  .by{font-size:15px}
+  .stat{font-size:18px;padding:6px 4px}
+  .stats{gap:8px}
+  .btn{font-size:20px;padding:9px 22px}
+  .btn.pill{font-size:19px;padding:6px 20px}
+  .btn.small{font-size:15px;padding:5px 12px}
+  .fab{right:16px;bottom:calc(88px + env(safe-area-inset-bottom))}
+  #toasts{bottom:calc(92px + env(safe-area-inset-bottom));width:calc(100% - 32px)}
+  .toast{font-size:16px;text-align:center}
+  .prof{gap:22px;justify-content:center;margin-bottom:26px}
+  .prof .form{flex:1 1 100%;max-width:none}
+  .prof .name{font-size:32px}
+  .field label{font-size:20px}
+  .pwpanel{padding:14px 14px 6px}
+  .mine{gap:12px}
+  .mine .gname{max-width:60vw}
+  .post{padding:14px 16px;box-shadow:4px 4px 0 var(--ink)}
+  .post .who{font-size:24px}
+  .post .txt{font-size:18px}
+  .auth-wrap{padding:16px;align-items:start;padding-top:calc(24px + env(safe-area-inset-top))}
+  .auth-card{padding:22px 20px 20px;border-radius:24px;box-shadow:6px 6px 0 var(--ink)}
+  .auth-card h1{font-size:28px}
+  .auth-card .big{font-size:58px;letter-spacing:4px}
+  .auth-card .tag{font-size:19px}
+  .overlay{padding:14px}
+  .modal{padding:18px;border-radius:20px;box-shadow:6px 6px 0 var(--ink)}
+  .mbtns{gap:10px}
+  .mbtns .btn{flex:1;padding:9px 12px}
+  .picker .cam{opacity:0}
+  .setup{margin:30px auto}
+}
+@media (max-width:380px){
+  .logo{font-size:28px}
+  .mename{max-width:80px}
+  .nav a{font-size:12px}
+  .tile{width:80px;height:80px}
+  .card{width:88vw}
 }
 </style>
 </head>
@@ -164,7 +240,7 @@ p{margin:0}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, setPersistence, browserLocalPersistence, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, arrayUnion, arrayRemove, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 /* ============================================================
    PASTE YOUR FIREBASE CONFIG HERE
@@ -201,7 +277,8 @@ function el(tag, props = {}, ...kids) {
   return n;
 }
 const ICONS = {
-  home: '<path d="M3 11.5 12 3.5l9 8"/><path d="M5.5 10v10h13V10"/>',
+  home: '<path d="M6.500 7h11A4.500 4.500 0 0 1 22 11.500v3a3 3 0 0 1-5.300 1.900L15.300 15H8.700l-1.400 1.400A3 3 0 0 1 2 14.500v-3A4.500 4.500 0 0 1 6.500 7z"/><path d="M7 10v4M5 12h4"/><path d="M16 11h.01M18.500 13h.01"/>',
+  friends: '<circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6z"/><path d="M16 4.800a3.300 3.300 0 0 1 0 6.400M18 14.300c2.300.7 3.500 2.700 3.500 5.700"/>',
   user: '<circle cx="12" cy="7" r="4"/><rect x="6" y="14" width="12" height="7" rx="3"/>',
   news: '<path d="M4 5h16v11h-9.5L6 20.5V16H4z"/>',
   create: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
@@ -229,7 +306,9 @@ const sfx = (() => {
       return ctx;
     } catch { return null; }
   };
+  const VOL = 1.45; /* overall loudness boost (phone speakers are quiet) */
   const tone = (c, f, t, d, type = 'sine', v = .1, to = null) => {
+    v = Math.min(v * VOL, .3);
     const o = c.createOscillator(), g = c.createGain(), s = c.currentTime + t;
     o.type = type; o.frequency.setValueAtTime(f, s);
     if (to) o.frequency.exponentialRampToValueAtTime(to, s + d);
@@ -241,6 +320,7 @@ const sfx = (() => {
   const seq = (notes, type, v, step = .08, d = .16) => () => { const c = get(); if (c) notes.forEach((f, i) => tone(c, f, i * step, d, type, v)); };
   return {
     get muted() { return muted; },
+    wake() { get(); },
     set(m) { muted = m; try { localStorage.setItem('hopuMuted', m ? '1' : '0'); } catch {} },
     click() { const c = get(); if (c) tone(c, 540, 0, .08, 'triangle', .13, 320); },
     hover() { const n = Date.now(); if (n - lastHover < 80) return; lastHover = n; const c = get(); if (c) tone(c, 1000, 0, .03, 'sine', .02); },
@@ -256,6 +336,8 @@ const sfx = (() => {
   };
 })();
 const SND_SEL = '.btn,.nav a,.logout,.stat,.rarrow,.logo,.me,.picker';
+/* iOS only unlocks audio after touchend/click, so wake the audio engine there too */
+['touchend', 'click'].forEach(ev => document.addEventListener(ev, () => sfx.wake(), { passive: true }));
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest?.(SND_SEL);
   if (!b || b.disabled) return;
@@ -322,7 +404,7 @@ const db = getFirestore(fbApp);
 await setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence', e));
 
 /* ---------- State ---------- */
-const state = { user: null, profile: null, games: [], news: [], users: new Map(), tok: 0, ready: false, registering: false, busy: false, search: '' };
+const state = { user: null, profile: null, games: [], news: [], users: new Map(), tok: 0, ready: false, registering: false, busy: false, search: '', fq: '' };
 const NAME_RE = /^[A-Za-z0-9_]{3,16}$/;
 const WEEK = 7 * 86400000;
 const isAdmin = () => state.profile?.username === 'Hopu';
@@ -441,10 +523,17 @@ function gameCard(g) {
         el('button', { class: 'btn pill', 'data-snd': 'play', onclick: () => play(g) }, 'Play'),
         isAdmin() ? el('button', { class: 'btn pill small', 'data-snd': 'del', onclick: () => removeGame(g) }, icon('trash'), 'Delete') : null)));
 }
-function section(title, games, empty) {
+function mineCard(g) {
+  return el('div', { class: 'card' }, tile(g),
+    el('div', { class: 'info' },
+      el('div', { class: 'gname', title: g.name }, g.name),
+      el('div', { class: 'acts', style: 'margin-top:8px' },
+        el('button', { class: 'btn pill', onclick: () => { location.hash = `#/game/${g.id}/edit`; } }, 'Edit'))));
+}
+function section(title, games, empty, mk = gameCard) {
   const sec = el('section', { class: 'sec' }, el('h2', {}, title));
   if (!games.length) { sec.append(el('p', { class: 'muted' }, empty)); return sec; }
-  const row = el('div', { class: 'row' }, games.map(gameCard));
+  const row = el('div', { class: 'row' }, games.map(mk));
   const arrow = el('button', { class: 'rarrow', 'aria-label': 'Next', onclick: () => row.scrollBy({ left: row.clientWidth * .8 }) }, icon('arrow'));
   const upd = () => { arrow.style.display = (row.scrollWidth > row.clientWidth + 4 && row.scrollLeft + row.clientWidth < row.scrollWidth - 8) ? 'grid' : 'none'; };
   row.addEventListener('scroll', upd);
@@ -457,7 +546,7 @@ const favGames = p => (p.favorites || []).map(id => state.games.find(g => g.id =
 /* ---------- Shell ---------- */
 function mount(active) {
   const p = state.profile;
-  const nav = [['home', 'Homepage', 'home'], ['profile', 'Profile', 'user'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
+  const nav = [['home', 'Games', 'home'], ['profile', 'Profile', 'user'], ['friends', 'Friends', 'friends'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
   const side = el('aside', { class: 'side' },
     el('a', { class: 'logo', href: '#/home' }, 'HOPU'),
     el('a', { class: 'me', href: '#/profile' }, avatar(p, 40), el('span', { class: 'mename' }, p.username)),
@@ -554,7 +643,7 @@ async function homeView(soft, tok) {
     }
   };
   input.addEventListener('input', () => { state.search = input.value; draw(); });
-  main.append(el('div', { class: 'head' }, el('h1', {}, 'Homepage'), el('div', { class: 'search' }, icon('search'), input)), box);
+  main.append(el('div', { class: 'head' }, el('h1', {}, 'Games'), el('div', { class: 'search' }, icon('search'), input)), box);
   draw();
 }
 
@@ -661,6 +750,60 @@ async function publicProfileView(soft, tok, uid) {
     section('Favorites', favGames(u), 'No Favorite Games Yet'));
 }
 
+async function friendsView(soft, tok) {
+  if (!soft) state.profile = await getUserDoc(state.user.uid, true);
+  if (tok !== state.tok) return;
+  const main = mount('friends');
+  const input = el('input', { type: 'text', placeholder: 'Search Players...', maxlength: 16, autocomplete: 'off' });
+  input.value = state.fq;
+  const box = el('div');
+  let seq = 0, timer = null;
+  const myFriends = () => state.profile.friends || [];
+
+  const toggle = async (u, add) => {
+    if (state.busy) return; state.busy = true;
+    try {
+      await updateDoc(doc(db, 'users', state.user.uid), { friends: add ? arrayUnion(u.id) : arrayRemove(u.id) });
+      state.profile = await getUserDoc(state.user.uid, true);
+      toast(add ? 'Friend Added' : 'Friend Removed');
+    } catch (e) { toast(friendly(e), 'err'); }
+    state.busy = false;
+    draw();
+  };
+  const row = (u, isFriend) => el('div', { class: 'person' },
+    avatar(u, 52),
+    el('a', { class: 'pname', href: `#/user/${u.id}`, title: u.username }, u.username),
+    isFriend
+      ? el('button', { class: 'btn pill small', 'data-snd': 'del', onclick: () => toggle(u, false) }, 'Remove')
+      : el('button', { class: 'btn pill small', 'data-snd': 'fav', onclick: () => toggle(u, true) }, 'Add'));
+  const block = (title, users, isFriend, empty) => el('section', { class: 'sec' }, el('h2', {}, title),
+    users.length ? users.map(u => row(u, isFriend)) : el('p', { class: 'muted' }, empty));
+
+  async function draw() {
+    const my = ++seq, q = input.value.trim().toLowerCase();
+    state.fq = input.value;
+    const all = (await Promise.all(myFriends().map(id => getUserDoc(id).catch(() => null)))).filter(Boolean);
+    const friends = (q ? all.filter(u => (u.usernameLower || '').includes(q)) : all)
+      .sort((a, b) => a.username.localeCompare(b.username));
+    let found = [], errMsg = '';
+    if (q) {
+      try {
+        const s = await getDocs(query(collection(db, 'users'), where('usernameLower', '>=', q), where('usernameLower', '<=', q + ''), limit(20)));
+        found = s.docs.map(d => { const u = { id: d.id, ...d.data() }; state.users.set(u.id, u); return u; });
+      } catch (e) { errMsg = friendly(e); }
+    }
+    if (my !== seq || tok !== state.tok) return;
+    const fresh = found.filter(u => u.id !== state.user.uid && !myFriends().includes(u.id));
+    box.replaceChildren(
+      block('Friends', friends, true, q ? 'None Of Your Friends Match' : "You Don't Have Any Friends Yet"),
+      q ? (errMsg ? el('p', { class: 'err' }, errMsg) : block('New People', fresh, false, 'No New Players Found'))
+        : el('p', { class: 'muted' }, 'Type A Name Above To Find New Players'));
+  }
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(draw, 250); });
+  main.append(el('div', { class: 'head' }, el('h1', {}, 'Friends'), el('div', { class: 'search' }, icon('search'), input)), box);
+  draw();
+}
+
 async function newsView(soft, tok) {
   if (!soft) {
     const s = await getDocs(query(collection(db, 'news'), orderBy('createdAt', 'desc'), limit(50)));
@@ -704,13 +847,8 @@ async function createView(soft, tok) {
   if (tok !== state.tok) return;
   const main = mount('create');
   const mine = state.games.filter(g => g.ownerId === state.user.uid);
-  main.append(el('h1', {}, 'Create'), el('h2', { style: 'margin:14px 0 14px' }, 'Your Games'));
-  if (!mine.length) main.append(el('p', { class: 'muted' }, "You Haven't Created Any Games Yet"));
-  for (const g of mine) {
-    main.append(el('div', { class: 'mine' }, tile(g), el('div', {},
-      el('div', { class: 'gname' }, g.name),
-      el('button', { class: 'btn pill', onclick: () => { location.hash = `#/game/${g.id}/edit`; } }, 'Edit'))));
-  }
+  main.append(el('h1', { style: 'margin-bottom:18px' }, 'Create'),
+    section('Your Games', mine, "You Haven't Created Any Games Yet", mineCard));
   main.append(el('button', { class: 'btn fab', onclick: () => { location.hash = '#/game/new'; } }, 'Create'));
 }
 
@@ -764,6 +902,7 @@ async function route() {
     if (!h || h === '#/login' || h === '#/register') { location.hash = '#/home'; return; }
     if (h === '#/home') return await homeView(false, tok);
     if (h === '#/profile') return await ownProfileView(false, tok);
+    if (h === '#/friends') return await friendsView(false, tok);
     if (h === '#/news') return await newsView(false, tok);
     if (h === '#/create') return await createView(false, tok);
     if (h === '#/game/new') return await gameEditorView(false, tok, null);
@@ -782,6 +921,7 @@ async function rerender() {
   try {
     if (h === '#/home') await homeView(true, tok);
     else if (h === '#/profile') await ownProfileView(true, tok);
+    else if (h === '#/friends') await friendsView(true, tok);
     else if (h === '#/news') await newsView(true, tok);
     else if (h === '#/create') await createView(true, tok);
     else if (h === '#/game/new') await gameEditorView(true, tok, null);
