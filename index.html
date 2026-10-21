@@ -116,7 +116,10 @@ p{margin:0}
 
 /* Friends */
 .person{display:flex;align-items:center;gap:14px;border:3px solid var(--ink);border-radius:22px;padding:10px 16px;margin-bottom:14px;max-width:640px;box-shadow:4px 4px 0 var(--ink)}
-.pname{flex:1;min-width:0;font-size:24px;font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pinfo{flex:1;min-width:0}
+.pname{display:block;font-size:24px;font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pnote{font-size:15px;color:var(--muted);margin-top:-2px}
+.person .acts{flex-wrap:nowrap}
 .pname:hover{text-decoration:underline;text-decoration-thickness:3px}
 .person .btn.small{font-size:17px;padding:5px 16px}
 
@@ -240,7 +243,7 @@ button,a,.picker{-webkit-tap-highlight-color:transparent;touch-action:manipulati
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, setPersistence, browserLocalPersistence, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, arrayUnion, arrayRemove, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, writeBatch, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 /* ============================================================
    PASTE YOUR FIREBASE CONFIG HERE
@@ -277,8 +280,8 @@ function el(tag, props = {}, ...kids) {
   return n;
 }
 const ICONS = {
-  home: '<path d="M6.500 7h11A4.500 4.500 0 0 1 22 11.500v3a3 3 0 0 1-5.300 1.900L15.300 15H8.700l-1.400 1.400A3 3 0 0 1 2 14.500v-3A4.500 4.500 0 0 1 6.500 7z"/><path d="M7 10v4M5 12h4"/><path d="M16 11h.01M18.500 13h.01"/>',
-  friends: '<circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6z"/><path d="M16 4.800a3.300 3.300 0 0 1 0 6.400M18 14.300c2.300.7 3.500 2.700 3.500 5.700"/>',
+  home: '<path d="M7 4.500v15a1 1 0 0 0 1.500 0.900l12-7.500a1 1 0 0 0 0-1.700l-12-7.500A1 1 0 0 0 7 4.500z"/>',
+  profiles: '<circle cx="9" cy="8" r="3.500"/><path d="M2.500 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6z"/><path d="M16 4.800a3.300 3.300 0 0 1 0 6.400M18 14.300c2.300.7 3.500 2.700 3.500 5.700"/>',
   user: '<circle cx="12" cy="7" r="4"/><rect x="6" y="14" width="12" height="7" rx="3"/>',
   news: '<path d="M4 5h16v11h-9.5L6 20.5V16H4z"/>',
   create: '<path d="M12 3l2.700 5.600 6.100.9-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.9z"/>',
@@ -546,7 +549,7 @@ const favGames = p => (p.favorites || []).map(id => state.games.find(g => g.id =
 /* ---------- Shell ---------- */
 function mount(active) {
   const p = state.profile;
-  const nav = [['home', 'Games', 'home'], ['profile', 'Profile', 'user'], ['friends', 'Friends', 'friends'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
+  const nav = [['home', 'Games', 'home'], ['profile', 'Profile', 'user'], ['profiles', 'Profiles', 'profiles'], ['news', 'News', 'news'], ['create', 'Create', 'create']];
   const side = el('aside', { class: 'side' },
     el('a', { class: 'logo', href: '#/home' }, 'HOPU'),
     el('a', { class: 'me', href: '#/profile' }, avatar(p, 40), el('span', { class: 'mename' }, p.username)),
@@ -750,58 +753,48 @@ async function publicProfileView(soft, tok, uid) {
     section('Favorites', favGames(u), 'No Favorite Games Yet'));
 }
 
-async function friendsView(soft, tok) {
-  if (!soft) state.profile = await getUserDoc(state.user.uid, true);
-  if (tok !== state.tok) return;
-  const main = mount('friends');
-  const input = el('input', { type: 'text', placeholder: 'Search Players...', maxlength: 16, autocomplete: 'off' });
+async function profilesView(soft, tok) {
+  const main = mount('profiles');
+  const input = el('input', { type: 'text', placeholder: 'Search...', maxlength: 16, autocomplete: 'off' });
   input.value = state.fq;
   const box = el('div');
-  let seq = 0, timer = null;
-  const myFriends = () => state.profile.friends || [];
-
-  const toggle = async (u, add) => {
-    if (state.busy) return; state.busy = true;
-    try {
-      await updateDoc(doc(db, 'users', state.user.uid), { friends: add ? arrayUnion(u.id) : arrayRemove(u.id) });
-      state.profile = await getUserDoc(state.user.uid, true);
-      toast(add ? 'Friend Added' : 'Friend Removed');
-    } catch (e) { toast(friendly(e), 'err'); }
-    state.busy = false;
-    draw();
-  };
-  const row = (u, isFriend) => el('div', { class: 'person' },
+  let seq = 0, timer = null, rec = null;
+  const row = u => el('div', { class: 'person' },
     avatar(u, 52),
-    el('a', { class: 'pname', href: `#/user/${u.id}`, title: u.username }, u.username),
-    isFriend
-      ? el('button', { class: 'btn pill small', 'data-snd': 'del', onclick: () => toggle(u, false) }, 'Remove')
-      : el('button', { class: 'btn pill small', 'data-snd': 'fav', onclick: () => toggle(u, true) }, 'Add'));
-  const block = (title, users, isFriend, empty) => el('section', { class: 'sec' }, el('h2', {}, title),
-    users.length ? users.map(u => row(u, isFriend)) : el('p', { class: 'muted' }, empty));
-
-  async function draw() {
+    el('div', { class: 'pinfo' },
+      el('a', { class: 'pname', href: u.id === state.user.uid ? '#/profile' : `#/user/${u.id}`, title: u.username }, u.username),
+      u.description ? el('div', { class: 'pnote' }, u.description.slice(0, 60)) : null),
+    el('button', { class: 'btn pill small', onclick: () => { location.hash = u.id === state.user.uid ? '#/profile' : `#/user/${u.id}`; } }, 'View'));
+  function showRec() {
+    if (input.value.trim() || !rec) return;
+    box.replaceChildren(el('section', { class: 'sec' }, el('h2', {}, 'Recommended'),
+      rec.length ? rec.map(row) : el('p', { class: 'muted' }, 'No Players Yet')));
+  }
+  async function loadRec() {
+    try {
+      const s = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(40)));
+      const all = s.docs.filter(d => d.id !== state.user.uid).map(d => { const u = { id: d.id, ...d.data() }; state.users.set(u.id, u); return u; });
+      for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
+      rec = all.slice(0, 8);
+    } catch (e) { rec = []; console.error(e); }
+    if (tok === state.tok) showRec();
+  }
+  async function search() {
     const my = ++seq, q = input.value.trim().toLowerCase();
     state.fq = input.value;
-    const all = (await Promise.all(myFriends().map(id => getUserDoc(id).catch(() => null)))).filter(Boolean);
-    const friends = (q ? all.filter(u => (u.usernameLower || '').includes(q)) : all)
-      .sort((a, b) => a.username.localeCompare(b.username));
-    let found = [], errMsg = '';
-    if (q) {
-      try {
-        const s = await getDocs(query(collection(db, 'users'), where('usernameLower', '>=', q), where('usernameLower', '<=', q + ''), limit(20)));
-        found = s.docs.map(d => { const u = { id: d.id, ...d.data() }; state.users.set(u.id, u); return u; });
-      } catch (e) { errMsg = friendly(e); }
-    }
+    if (!q) { showRec(); return; }
+    let res = [], err = '';
+    try {
+      const s = await getDocs(query(collection(db, 'users'), where('usernameLower', '>=', q), where('usernameLower', '<=', q + '\uf8ff'), limit(30)));
+      res = s.docs.map(d => { const u = { id: d.id, ...d.data() }; state.users.set(u.id, u); return u; });
+    } catch (e) { err = friendly(e); console.error(e); }
     if (my !== seq || tok !== state.tok) return;
-    const fresh = found.filter(u => u.id !== state.user.uid && !myFriends().includes(u.id));
-    box.replaceChildren(
-      block('Friends', friends, true, q ? 'None Of Your Friends Match' : "You Don't Have Any Friends Yet"),
-      q ? (errMsg ? el('p', { class: 'err' }, errMsg) : block('New People', fresh, false, 'No New Players Found'))
-        : el('p', { class: 'muted' }, 'Type A Name Above To Find New Players'));
+    box.replaceChildren(err ? el('p', { class: 'err' }, err)
+      : el('section', { class: 'sec' }, el('h2', {}, 'Players'), res.length ? res.map(row) : el('p', { class: 'muted' }, 'No Players Found')));
   }
-  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(draw, 250); });
-  main.append(el('div', { class: 'head' }, el('h1', {}, 'Friends'), el('div', { class: 'search' }, icon('search'), input)), box);
-  draw();
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 250); });
+  main.append(el('div', { class: 'head' }, el('h1', {}, 'Profiles'), el('div', { class: 'search' }, icon('search'), input)), box);
+  if (state.fq.trim()) search(); else loadRec();
 }
 
 async function newsView(soft, tok) {
@@ -902,7 +895,7 @@ async function route() {
     if (!h || h === '#/login' || h === '#/register') { location.hash = '#/home'; return; }
     if (h === '#/home') return await homeView(false, tok);
     if (h === '#/profile') return await ownProfileView(false, tok);
-    if (h === '#/friends') return await friendsView(false, tok);
+    if (h === '#/profiles') return await profilesView(false, tok);
     if (h === '#/news') return await newsView(false, tok);
     if (h === '#/create') return await createView(false, tok);
     if (h === '#/game/new') return await gameEditorView(false, tok, null);
@@ -921,7 +914,7 @@ async function rerender() {
   try {
     if (h === '#/home') await homeView(true, tok);
     else if (h === '#/profile') await ownProfileView(true, tok);
-    else if (h === '#/friends') await friendsView(true, tok);
+    else if (h === '#/profiles') await profilesView(true, tok);
     else if (h === '#/news') await newsView(true, tok);
     else if (h === '#/create') await createView(true, tok);
     else if (h === '#/game/new') await gameEditorView(true, tok, null);
